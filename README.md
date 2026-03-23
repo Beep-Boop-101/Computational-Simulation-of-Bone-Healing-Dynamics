@@ -13,7 +13,6 @@ The physical domain of the bone is represented as a 3D NumPy ndarray, where each
 - **Euler Integration**:
 
 A first-order Forward Euler method will be used to iteratively update bone density (dp/dt) based on the "Lazy Zone" mechanostatic equations.
-
   
 - **Finite Difference Method (FDM)**:
 
@@ -22,7 +21,6 @@ A first-order Forward Euler method will be used to iteratively update bone densi
 - **Spatial Mapping**:
 
 Spatial Mapping: Use of pydicom and PyVista to map Hounsfield Units from CT scans directly into the simulation's starting density values.
-
 
 ## Planned Directory Structure:
 
@@ -41,9 +39,7 @@ Spatial Mapping: Use of pydicom and PyVista to map Hounsfield Units from CT scan
 ├── requirements.txt        # numpy, scipy, pydicom, pyvista, numba
 └── main.py                 # Entry point for the simulation loop
 ```
-
 ## Resources:
-
 
 - **Datasets**:
 
@@ -53,10 +49,12 @@ Virtual Skeleton Database (Zenodo) for baseline CT scans; TCIA for fracture-spec
 
 NumPy (Arrays), SciPy (Solvers), PyVista (3D Mesh), pydicom (Medical Data), Numba (Optimization).
 
+May use 3D Slicer in place of PyVista if it is more efficient
+
 ## Rough Timeline:
 
 - **Phase 1**:
-
+.
 Setup (March 23 – April 5): DICOM acquisition, Hounsfield-to-Density mapping, and environment setup (pydicom, PyVista).
 
 - **Phase 2**:
@@ -67,11 +65,11 @@ Physics Implementation (April 6 – April 17): Develop the strain-calculation en
 
 Biological Solver (April 18 – April 30): Implement a Decision Tree for changes in bone tissue and Euler integration loops. Add Diffusion kernels for BMP-2.
 
+I also intend to implement some form of visualization which can show the movement of cells and the diffusion of BMP-2.
 
 - **Phase 4**:
 
 Reach Goals & Refinement (May 1 – May 7): Integrate the Angiogenesis layer and optimize with Numba. (Ready for Peer Review on May 7).
-
 
 - **Phase 5**:
 
@@ -87,12 +85,8 @@ I would like to implement a secondary "Vascular" layer where bone mineralization
 
 Utilize Numba's @njit compilation to parallelize the voxel-by-voxel calculations, allowing for higher-resolution simulations in shorter time.
 
-
 ### Literature:
 1. **Lacroix, D., & Prendergast, P. J. (2002).** A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. *Journal of Biomechanics*, 35(9), 1163-1171.
    - *Applied to:* The voxel-based tissue phenotype decision tree.
 2. **Komarova, S. V., et al. (2003).** Mathematical model predicts a critical role for osteoclast autocrine regulation in the control of bone remodeling. *Bone*, 33(2), 206-215.
    - *Applied to:* The ODE cellular dynamics of osteoblasts and osteoclasts.
-
-
-
