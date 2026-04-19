@@ -1,0 +1,6 @@
+numpy
+scipy
+pydicom
+pyvista
+numba
+matplotlib
