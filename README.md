@@ -72,6 +72,8 @@ If trying to use external geometries, like from a CT, 3D Slicer is used to gener
 
 ## Usage guide
 
+To run the simulation, you just need to run the main.py module.
+
 If you want to modify anything about the simulation, you only need to look in the config and the main files. All the modulus are built around config so that they do not define any constants locally. If you change anything about the structure of the package, make sure the imports from config are still intact so that there are no missing values (I would recommend just keeping my structure).
 
 Make sure to have numpy, matplotlib, and scipy pip installed before running. you could run this to do that 
