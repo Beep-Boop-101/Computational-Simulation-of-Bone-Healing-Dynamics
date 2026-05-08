@@ -29,5 +29,6 @@ def create_artificial_geometry(size=size):
                 grid[x, y, z, 2] = PROPERTIES['cortical_bone']['E']   # Cortical Bone E
                 grid[x, y, z, 3] = PROPERTIES['cortical_bone']['perm']  # Cortical Bone Perm
                 grid[x, y, z, 1] =  normal_cell_density   # Fully populated with cells
+    
                     
     return grid

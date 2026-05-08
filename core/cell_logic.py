@@ -15,7 +15,6 @@ def update_cell_diffusion(bone_data, D=D, dt=dt):
     #n_new[-1, :, :] = 1.0 # Right face
     #n_new[:, 0, :] = 1.0  # Front face
     #n_new[:, -1, :] = 1.0 # Back face
-    # We typically leave Z (top/bottom) to the cortical bone logic
     
     bone_data[:, :, :, 1] = n_new
     return bone_data

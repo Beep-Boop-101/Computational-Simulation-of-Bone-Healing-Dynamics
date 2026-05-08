@@ -1,6 +1,6 @@
 # new version
 import numpy as np
-from config import PROPERTIES, a_param, n_max, applied_force, voxel_size
+from config import PROPERTIES, a_param, n_max, applied_force, voxel_size, alpha
 
 def run_bone_simulation_step(bone_grid, force_vec=applied_force, voxel_size=voxel_size):
     """
@@ -25,7 +25,7 @@ def run_bone_simulation_step(bone_grid, force_vec=applied_force, voxel_size=voxe
     # --- PART 2: STIMULUS ---
     diff_sq = (eps_x - eps_y)**2 + (eps_y - eps_z)**2 + (eps_z - eps_x)**2
     gamma_oct = (2/3) * np.sqrt(diff_sq)
-    S = gamma_oct / a_param # shortened form
+    S = gamma_oct / a_param # shortened form, not accounting for fluid flow in bone.
     bone_grid[:, :, :, 0] = S
 
     # --- PART 3: DIFFERENTIATION (Using np.select) ---
@@ -33,8 +33,8 @@ def run_bone_simulation_step(bone_grid, force_vec=applied_force, voxel_size=voxe
     conds = [
         (S >= 3.0),                               # Fibrous
         (S >= 1.0) & (S < 3.0),                   # Cartilage
-        (S >= 0.01) & (S < 1.0) & (n > 0.8),      # Mature Bone
-        (S >= 0.01) & (S < 1.0) & (n <= 0.8),     # Immature Bone
+        (S >= 0.01) & (S < 1.0) & (n > 0.6),      # Mature Bone
+        (S >= 0.01) & (S < 1.0) & (n <= 0.6),     # Immature Bone
         (S < 0.01)                                # Marrow
     ]
     
@@ -58,13 +58,7 @@ def run_bone_simulation_step(bone_grid, force_vec=applied_force, voxel_size=voxe
     # np.select matches the condition to the target value across the whole grid
     target_E_grid = np.select(conds, targets_E, default=PROPERTIES['granulation']['E'])
     target_K_grid = np.select(conds, targets_K, default=PROPERTIES['granulation']['perm'])
-    
-    # --- NEW: PART 3.5: THE PROTECTIVE MASK ---
-    # Identify voxels that are already Cortical Bone (E = 20000)
-    # We use a threshold of 19000 to be safe
-    #is_cortical = bone_grid[:, :, :, 2] >= 19000
 
-    # --- PART 4: RULE OF MIXTURES (With Mask) ---
     # --- PART 4: RULE OF MIXTURES (With Mask) ---
     E_gran = PROPERTIES['granulation']['E']
     K_gran = PROPERTIES['granulation']['perm']
@@ -73,24 +67,8 @@ def run_bone_simulation_step(bone_grid, force_vec=applied_force, voxel_size=voxe
     target_new_E = (n / n_max) * target_E_grid + (1 - n/n_max) * E_gran
     target_new_K = (n / n_max) * target_K_grid + (1 - n/n_max) * K_gran
     
-    bone_grid[:, :, :, 2] = target_new_E
-    bone_grid[:, :, :, 3] = target_new_K
+    # Update the bone grid's E and Permeability towards the target values using the alpha constant for gradual change to avoid sudden jumps in properties, creating a more realistic healing process.
+    bone_grid[:, :, :, 2] +=  alpha * (target_new_E - bone_grid[:, :, :, 2])
+    bone_grid[:, :, :, 3] +=  alpha * (target_new_K - bone_grid[:, :, :, 3])
         
     return bone_grid
-
-
-
-
-
-
-
-
-    ## --- PART 4: RULE OF MIXTURES (Temporal Update) ---
-    #E_gran = PROPERTIES['granulation']['E']
-    #K_gran = PROPERTIES['granulation']['perm']
-    
-    # Update E and Permeability based on cell density maturation
-    #bone_grid[:, :, :, 2] = (n / n_max) * target_E_grid + (1 - n/n_max) * E_gran
-    #bone_grid[:, :, :, 3] = (n / n_max) * target_K_grid + (1 - n/n_max) * K_gran
-    
-    #return bone_grid)

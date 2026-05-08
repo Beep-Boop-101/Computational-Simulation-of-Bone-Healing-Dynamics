@@ -2,91 +2,91 @@
 
 ## Project Description:
 
-This project's purpose is to simulate in silico bone fracture healing through modeling the mechanobiological interaction between physical stress and cellular regeneration. Using a voxel-based finite element approach, the simulation will track how mesenchymal stem cells migrate to a fracture gap and differentiate into fibrous tissue, cartilage, or bone based on local mechanical strain. The primary goal is to visualize the "healing front" as it moves from the periosteum toward the center of the injury, predicting whether a specific mechanical environment will lead to successful union or a "non-union" failure.
+This project's purpose is to simulate in silico bone fracture healing through modeling the mechanobiological interaction between physical stress and cellular regeneration. Using a Lattice-based Bone Map, the simulation tracks mesenchymal stem cells migrate to a fracture gap. These cells can then differentiate into fibrous tissue, cartilage, or bone based on local mechanical strain. The primary goal is to visualize the "healing front" as it moves from the edges of the fracture toward the center of the injury, predicting whether a specific mechanical environment will lead to successful union or a "non-union" failure.
 
 ## Numerical Methods:
 
 - **Voxel-based Lattice**:
 
-The physical domain of the bone is represented as a 3D NumPy ndarray, where each element stores a state vector (Density, Young’s Modulus, and Tissue Type).
+The physical domain of the bone is represented as a 3D NumPy ndarray, where each element stores a state vector (stimulus, cell density, young's modulus, and permitivity).
 
 - **Euler Integration**:
 
-A first-order Forward Euler method will be used to iteratively update bone density (dp/dt) based on the "Lazy Zone" mechanostatic equations.
+A first-order update method is used to iteratively evolve the Young’s Modulus toward a target phenotype based on the calculated stimulus. Avoids bone suddenly "appearing" out of nowhere.
   
 - **Finite Difference Method (FDM)**:
 
-3D Laplacian convolution kernels will solve the Reaction-Diffusion equations for cell migration and Growth Factor (BMP-2) spread to more accurately model how cells an other materials move through bone.
-  
-- **Spatial Mapping**:
+dn/dt is calculated as the 3D Laplacian of the cell density which will be calculated using scipy.ndimage.laplace which solves for the laplacian of cell density.
 
-Spatial Mapping: Use of pydicom and PyVista to map Hounsfield Units from CT scans directly into the simulation's starting density values.
+## Directory Structure:
 
-## Planned Directory Structure:
+The project is organized into a modular structure to separate simulation logic, configuration, and utility functions:
 
 ```text
 .
-├── data/
-│   ├── raw/                # Original .dcm (DICOM) files
-│   └── processed/          # .npy files (serialized NumPy arrays)
-├── src/
-│   ├── solver.py           # Euler integration & Diffusion logic
-│   ├── physics_engine.py   # Strain/Stress calculation per voxel
-│   ├── utils.py            # DICOM parsing and Voxelization functions
-│   └── visualize.py        # PyVista/Matplotlib scripts for 3D plotting
-├── docs/                   # Project proposal and mathematical derivations
-├── results/                # Generated heatmaps and 3D growth animations
-├── requirements.txt        # numpy, scipy, pydicom, pyvista, numba
-└── main.py                 # Entry point for the simulation loop
+├── core/                        # Core simulation logic
+│   ├── __init__.py              # Makes the directory a Python package
+│   ├── cell_logic.py            # Cell diffusion and migration (laplace operator)
+│   └── tissue_logic.py          # Mechano-regulation and differentiation logic
+├── data/                        # Data storage
+│   ├── processed/               # Cleaned or final simulation outputs
+│   └── raw/                     # Initial conditions or external data
+├── results/                     # Directory for saved plots and snapshots
+├── utils/                       # Helper functions
+│   ├── __init__.py              # Makes the directory a Python package
+│   ├── generation.py            # Functions to create artificial bone geometry
+│   └── visualize.py             # Matplotlib logic for temporal healing plots
+├── config.py                    # Central configuration (properties, forces, constants)
+├── main.py                      # Main entry point; runs the simulation loop
+├── README.md                    # Project documentation and overview
+├── requirements.txt             # List of required Python libraries
+└── .gitignore                   # Files and folders for Git to ignore (e.g., __pycache__)
 ```
+## important modules
+
+*cell_logic.py*
+
+Handles cell diffusion throughout fracture. Is where laplacian is calculated
+
+*tissue_logic.py*
+
+Handles calculation of stimulation due to applied force and subsequent change in Young's modulus of bone in fracture.
+
+*generation.py*
+
+Handles generation of artificial bone geometery.
+
+
+## Further building
+
+If the user wants to store the bone grid at any given time step, there is a results section which these can be saved to. additionally, there is a raw and processed data section the storage of scan data if one wants to try using this code on a more complicated geometry like a ct scan. An example scan would be included, but it is too much data to upload.
+
+
 ## Resources:
-
-- **Datasets**:
-
-Virtual Skeleton Database (Zenodo) for baseline CT scans; TCIA for fracture-specific DICOMs.
 
 - **Libraries**:
 
-NumPy (Arrays), SciPy (Solvers), PyVista (3D Mesh), pydicom (Medical Data), Numba (Optimization).
+NumPy (Arrays), SciPy (Solvers), Matplot lib (Graphing)
 
-May use 3D Slicer in place of PyVista if it is more efficient
+If trying to use external geometries, like from a CT, 3D Slicer is used to generate the mesh and is saved.
 
-## Rough Timeline:
+## Usage guide
 
-- **Phase 1**:
-.
-Setup (March 23 – April 5): DICOM acquisition, Hounsfield-to-Density mapping, and environment setup (pydicom, PyVista).
+If you want to modify anything about the simulation, you only need to look in the config and the main files. All the modulus are built around config so that they do not define any constants locally. If you change anything about the structure of the package, make sure the imports from config are still intact so that there are no missing values(I would recommend just keeping my structure).
 
-- **Phase 2**:
+Make sure to have numpy, matplotlib, and scipy pip installed before running. you could run this to do that "pip install numpy matplotlib scipy".
 
-Physics Implementation (April 6 – April 17): Develop the strain-calculation engine. 
+Be carful about modifying constants like D, alpha, and the applied force. The simulation is very sensitive to these constants. The force is an especially sensitive constant.
 
-- **Phase 3**:
+Be careful about running this simulations on a personal laptop, unless you enjoy the sound of your cooling fans trying to achieve lift-off. The simulation is very memory intensive and it could be very demanding depending on your device.
 
-Biological Solver (April 18 – April 30): Implement a Decision Tree for changes in bone tissue and Euler integration loops. Add Diffusion kernels for BMP-2.
+You may see some sections of the code that are commented out. Most of these are pieces of code i am hoping i will be able to implement later, if possible.
 
-I also intend to implement some form of visualization which can show the movement of cells and the diffusion of BMP-2.
-
-- **Phase 4**:
-
-Reach Goals & Refinement (May 1 – May 7): Integrate the Angiogenesis layer and optimize with Numba. (Ready for Peer Review on May 7).
-
-- **Phase 5**:
-
-Finalization (May 7 – Final Exam): Final simulation runs, data visualization, and documentation.
-
-## Reach Goals:
-
-- **Reach Goal 1: Angiogenesis & Vascular Coupling (VEGF)**:
-
-I would like to implement a secondary "Vascular" layer where bone mineralization is restricted by blood vessel density. This will use a Deterministic Diffusion model for VEGF; if time permits, a Stochastic Agent-Based Model will be used to simulate realistic capillary branching.
-
-- **Reach Goal 2: Computational Optimization**:
-
-Utilize Numba's @njit compilation to parallelize the voxel-by-voxel calculations, allowing for higher-resolution simulations in shorter time.
+At the moment, I am using a "brick" of artificially generated bone for tests of the simulation. If you want to make any changes in this regard, that would be in the utils.generation.
 
 ### Literature:
 1. **Lacroix, D., & Prendergast, P. J. (2002).** A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. *Journal of Biomechanics*, 35(9), 1163-1171.
    - *Applied to:* The voxel-based tissue phenotype decision tree.
 2. **Komarova, S. V., et al. (2003).** Mathematical model predicts a critical role for osteoclast autocrine regulation in the control of bone remodeling. *Bone*, 33(2), 206-215.
    - *Applied to:* The ODE cellular dynamics of osteoblasts and osteoclasts.
+3. **R. HUISKES*, W. D., & Prendergast, P. J. (1997).** A biomechanical regulatory model for periprosthetic fibrous-tissue differentiation. *Journal of Material Science*, 8, 785–788.

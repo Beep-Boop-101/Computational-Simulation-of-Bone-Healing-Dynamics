@@ -1,40 +1,71 @@
-import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, RadioButtons
+import numpy as np
+from matplotlib.widgets import Slider, RadioButtons
 
-def plot_healing_over_time(history, days_logged, slice_idx=None):
-    """
-    Plots a 2-row grid: 
-    Top Row: Cell Density (n)
-    Bottom Row: Young's Modulus (E)
-    """
-    num_snaps = len(history)
-    # Create 2 rows (one for n, one for E)
-    fig, axes = plt.subplots(2, num_snaps, figsize=(num_snaps * 3, 7))
-    
-    if slice_idx is None:
-        slice_idx = history[0].shape[2] // 2
+def create_interactive_slicer(history, days_logged):
+    curr_day_idx = 0
+    curr_slice_idx = history[0].shape[0] // 2
+    curr_mode = 1  # 1: Density, 2: Stiffness
+    curr_axis = 2  # Default: Axial (Z)
 
-    for i, grid in enumerate(history):
-        # --- ROW 1: CELL DENSITY (Index 1) ---
-        n_data = grid[:, slice_idx, :, 1] 
-        im_n = axes[0, i].imshow(n_data, cmap='viridis', vmin=0, vmax=1.0)
-        axes[0, i].set_title(f"Day {days_logged[i]}\nCell Density", fontsize=10)
-        axes[0, i].axis('off')
+    fig, ax = plt.subplots(figsize=(10, 8))
+    plt.subplots_adjust(left=0.25, bottom=0.25)
+
+    def get_slice_data(day_idx, s_idx, axis, mode):
+        grid = history[day_idx]
+        if axis == 0: return grid[s_idx, :, :, mode]   # Sagittal (X)
+        if axis == 1: return grid[:, s_idx, :, mode]   # Coronal (Y)
+        return grid[:, :, s_idx, mode]                 # Axial (Z)
+
+    # Initial plot
+    img = ax.imshow(get_slice_data(0, curr_slice_idx, 2, 1), cmap='viridis', vmin=0, vmax=1)
+    cb = fig.colorbar(img, ax=ax)
+    ax.set_title(f"Day {days_logged[0]} | Axial Slice {curr_slice_idx}")
+
+    # --- WIDGETS ---
+    ax_day = plt.axes([0.35, 0.1, 0.45, 0.03])
+    s_day = Slider(ax_day, 'Day Index', 0, len(days_logged)-1, valinit=0, valfmt='%d')
+
+    ax_slice = plt.axes([0.35, 0.05, 0.45, 0.03])
+    s_slice = Slider(ax_slice, 'Voxel Slice', 0, history[0].shape[0]-1, valinit=curr_slice_idx, valfmt='%d')
+
+    ax_data = plt.axes([0.05, 0.6, 0.15, 0.15])
+    radio_data = RadioButtons(ax_data, ('Cell Density', 'Stiffness (E)'))
+
+    ax_axis = plt.axes([0.05, 0.35, 0.15, 0.15])
+    radio_axis = RadioButtons(ax_axis, ('Axial (Z)', 'Sagittal (X)', 'Coronal (Y)'))
+
+    def update(val):
+        d_idx = int(s_day.val)
+        sl_idx = int(s_slice.val)
         
-        # --- ROW 2: YOUNG'S MODULUS (Index 2) ---
-        e_data = grid[:, slice_idx, :, 2]
-        # Use vmin/vmax to see the healing gap clearly against the 20,000MPa bone
-        im_e = axes[1, i].imshow(e_data, cmap='jet', vmin=1)
-        axes[1, i].set_title(f"Young's Modulus", fontsize=10)
-        axes[1, i].axis('off')
+        # Determine Data Mode
+        is_stiffness = radio_data.value_selected == 'Stiffness (E)'
+        mode = 2 if is_stiffness else 1
         
-    # Add colorbars for each row
-    fig.subplots_adjust(right=0.9)
-    cbar_ax_n = fig.add_axes([0.92, 0.55, 0.015, 0.35])
-    fig.colorbar(im_n, cax=cbar_ax_n, label="Cell Density (n)")
-    
-    cbar_ax_e = fig.add_axes([0.92, 0.1, 0.015, 0.35])
-    fig.colorbar(im_e, cax=cbar_ax_e, label="E (MPa)")
+        # Determine Plane
+        label = radio_axis.value_selected
+        axis = 2 if 'Z' in label else (0 if 'X' in label else 1)
+        
+        # Update Image
+        img.set_data(get_slice_data(d_idx, sl_idx, axis, mode))
+        
+        if is_stiffness:
+            img.set_cmap('jet')
+            img.set_clim(1, 8000)
+            cb.set_label("E (MPa)")
+        else:
+            img.set_cmap('viridis')
+            img.set_clim(0, 1)
+            cb.set_label("Cell Density (n)")
 
-    plt.suptitle(f"Healing Progression at Z-Slice {slice_idx} (Top: n, Bottom: E)", fontsize=14)
+        ax.set_title(f"Day {days_logged[d_idx]} | {label} {sl_idx}")
+        fig.canvas.draw_idle()
+
+    s_day.on_changed(update)
+    s_slice.on_changed(update)
+    radio_data.on_clicked(update)
+    radio_axis.on_clicked(update)
+
     plt.show()

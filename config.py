@@ -28,16 +28,24 @@ normal_bone_perm = 1e-17     # m^2, permeability for cortical
 normal_cell_density = 1.0       # Fully populated with cells (0 to 1 scale)
 
 # --- SIMULATION CONFIGURATION ---
-size = 50           # Grid dimensions (50x50x50)
+size = 50           # Grid dimensions (50x50x50). Runtime is very dependent on this value. Adjust as needed for testing or higher resolution.
 voxel_size = 1.0    # 1mm voxels
-num_days = 150       # Simulation duration
-save_interval = 20  # How often to take a snapshot for the visualizer
+num_hours = 112 * 24       # Simulation duration in hours (112 days)
+save_interval = 24  # How often to take a snapshot for the visualizer. 1 means every hour, 24 means every day, etc.
 
 
-# Applied Force: Using 2.5 N to keep Stimulus (S) in the healing range
+# Applied Force: We will simulate gradual loading during healing by increasing the applied force over time to reflect the natural process of weight-bearing and rehabilitation. The force will start low to represent the initial rest period after a fracture and will gradually increase to simulate the patient beginning to bear weight on the healing bone.
 
-applied_force = np.array([0, 0, -2.5])
+applied_force = np.array([0, 0, -0.15])  # Initial force vector (Fx, Fy, Fz) in Newtons. We will update the components during the simulation to simulate loading during healing.
 
 # ___ Movement constants ___
-D = 0.45  # Diffusion coefficient for cell migration (arbitrary units)
-dt = 1.0   # Time step for the simulation (1 day)
+D = 10  # Diffusion coefficient for cell migration (arbitrary units)
+dt = 1.0/24   # Time step for the simulation (1 hour in days)
+
+# ___ Differentiation update constant ___
+alpha = 0.005  # How quickly the tissue properties update towards the target values (0 < alpha <= 1, where 1 means instant update). Prevents sudden jumps in E and permeability, creating a more gradual healing process.
+
+# Body weight and force growth rate for simulating gradual loading during healing. Not used in the current implementation but can potentially be used to more accurately calculate the rate of increase in applied force over time to simulate rehabilitation and weight-bearing during the healing process.
+body_weight = 0.05  # Newtons Approximate weight of the limb being simulated on the bone segment. Adjust as needed for different scenarios (e.g., upper limb vs lower limb).
+
+rate_force_growth = body_weight / (num_hours / 24) # How much the applied force increases each day to simulate gradual loading during healing. Adjust as needed for different healing scenarios.
