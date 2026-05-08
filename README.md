@@ -59,7 +59,7 @@ Handles generation of artificial bone geometery.
 
 ## Further building
 
-If the user wants to store the bone grid at any given time step, there is a results section which these can be saved to. additionally, there is a raw and processed data section the storage of scan data if one wants to try using this code on a more complicated geometry like a ct scan. An example scan would be included, but it is too much data to upload.
+If the user wants to store the bone grid at any given time step, there is a results section which these can be saved to. additionally, there is a raw and processed data section for the storage of scan data if one wants to try using this code on a more complicated geometry like a CT scan. An example scan would be included, but it is too much data to upload.
 
 
 ## Resources:
@@ -72,17 +72,18 @@ If trying to use external geometries, like from a CT, 3D Slicer is used to gener
 
 ## Usage guide
 
-If you want to modify anything about the simulation, you only need to look in the config and the main files. All the modulus are built around config so that they do not define any constants locally. If you change anything about the structure of the package, make sure the imports from config are still intact so that there are no missing values(I would recommend just keeping my structure).
+If you want to modify anything about the simulation, you only need to look in the config and the main files. All the modulus are built around config so that they do not define any constants locally. If you change anything about the structure of the package, make sure the imports from config are still intact so that there are no missing values (I would recommend just keeping my structure).
 
-Make sure to have numpy, matplotlib, and scipy pip installed before running. you could run this to do that "pip install numpy matplotlib scipy".
+Make sure to have numpy, matplotlib, and scipy pip installed before running. you could run this to do that 
+"pip install numpy matplotlib scipy".
 
 Be carful about modifying constants like D, alpha, and the applied force. The simulation is very sensitive to these constants. The force is an especially sensitive constant.
 
 Be careful about running this simulations on a personal laptop, unless you enjoy the sound of your cooling fans trying to achieve lift-off. The simulation is very memory intensive and it could be very demanding depending on your device.
 
-You may see some sections of the code that are commented out. Most of these are pieces of code i am hoping i will be able to implement later, if possible.
+You may see some sections of the code that are commented out. Most of these are pieces of code I am hoping I will be able to implement later, if possible.
 
-At the moment, I am using a "brick" of artificially generated bone for tests of the simulation. If you want to make any changes in this regard, that would be in the utils.generation.
+At the moment, I am using a "brick" of artificially generated bone for tests of the simulation. If you want to make any changes in this regard, that would be in the utils.generation module.
 
 ### Literature:
 1. **Lacroix, D., & Prendergast, P. J. (2002).** A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. *Journal of Biomechanics*, 35(9), 1163-1171.
