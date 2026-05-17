@@ -4,11 +4,20 @@ from config import PROPERTIES, a_param, n_max, applied_force, voxel_size, alpha
 
 def run_bone_simulation_step(bone_grid, force_vec=applied_force, voxel_size=voxel_size):
     """
+    Argument: bone_grid: A 4D numpy array representing the current state of the bone grid.
+
     bone_grid index map:
     0: Stimulus (S)
     1: Cell Density (n)
     2: Young's Modulus (E)
     3: Permeability (k)
+
+    This function performs one simulation step of the bone healing process. 
+    It takes the current bone grid, applies the mechanical loading to calculate strain, and computes the stimulus based on the strain. 
+    It then updates the tissue properties (E and permeability) based on the stimulus and cell density using a rule of mixtures approach.
+
+    Returns: A 4D numpy array representing the updated bone grid after applying the mechanical loading and updating the tissue properties.
+
     """
     E_current = bone_grid[:, :, :, 2]
     n = bone_grid[:, :, :, 1]

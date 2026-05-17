@@ -3,6 +3,16 @@ from scipy.ndimage import laplace
 from config import D, dt
 
 def update_cell_diffusion(bone_data, D=D, dt=dt):
+    '''
+    Argument: bone_data: A 4D numpy array representing the current state of the bone grid.
+
+    Updates the cell density (n) in the bone grid based on diffusion and boundary source logic.
+    The function takes the current bone data grid, applies diffusion to the cell density, and then updates the grid with the new cell density values.
+
+    Returns: A 4D numpy array representing the updated bone grid with the new cell density values.
+
+    '''
+
     n = bone_data[:, :, :, 1]
     
     # Standard diffusion calculation
