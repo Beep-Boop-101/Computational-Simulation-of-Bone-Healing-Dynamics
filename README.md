@@ -1,65 +1,65 @@
 # Computational Simulation of Bone Healing Dynamics: Integrating Mechanical Strain and Cellular Differentiation
 
-## Project Description:
+## Project Description
+This project simulates *in silico* bone fracture healing by modeling the mechanobiological interaction between physical stress and cellular regeneration. Using a Lattice-based Bone Map, the simulation tracks the migration of mesenchymal stem cells into a fracture gap. These cells differentiate into fibrous tissue, cartilage, or bone based on local mechanical strain profiles. 
 
-This project's purpose is to simulate in silico bone fracture healing through modeling the mechanobiological interaction between physical stress and cellular regeneration. Using a Lattice-based Bone Map, the simulation tracks mesenchymal stem cells migrate to a fracture gap. These cells can then differentiate into fibrous tissue, cartilage, or bone based on local mechanical strain. The primary goal is to visualize the "healing front" as it moves from the edges of the fracture toward the center of the injury, predicting whether a specific mechanical environment will lead to successful union or a "non-union" failure.
+The primary goal is to visualize the "healing front" as it moves from the intact cortical edges of the fracture toward the center of the injury, predicting whether a specific mechanical loading environment will lead to a successful union or a "non-union" clinical failure.
 
-## Numerical Methods:
+## Numerical Methods
 
-- **Voxel-based Lattice**:
-
-The physical domain of the bone is represented as a 3D NumPy ndarray, where each element stores a state vector (stimulus, cell density, young's modulus, and permitivity).
-
-- **Euler Integration**:
-
-A first-order update method is used to iteratively evolve the Young’s Modulus toward a target phenotype based on the calculated stimulus. Avoids bone suddenly "appearing" out of nowhere.
+- **Voxel-based Lattice**: 
+  The physical domain of the bone is represented as a 3D NumPy `ndarray`, where each element stores a structural state vector: `[Stimulus (S), Cell Density (n), Young's Modulus (E), Permeability (k)]`.
   
-- **Finite Difference Method (FDM)**:
+- **Euler Integration**: 
+  A first-order update method is used to iteratively evolve the Young’s Modulus ($E$) and Permeability ($k$) toward a target biological phenotype based on calculated mechanical stimulus. This creates a realistic, gradual stabilization process rather than tissue instantly appearing.
+  
+- **Finite Difference Method (FDM)**: 
+  The rate of change of cellular concentration over time ($\partial n/\partial t$) is modeled as a 3D Laplacian of cell density, computed efficiently using `scipy.ndimage.laplace`.
 
-dn/dt is calculated as the 3D Laplacian of the cell density which will be calculated using scipy.ndimage.laplace which solves for the laplacian of cell density.
+---
 
-## Directory Structure:
-
-The project is organized into a modular structure to separate simulation logic, configuration, and utility functions:
+## Directory Structure
+The project is organized into a modular structure to separate simulation physics, biological logic, configuration, and utility functions:
 
 ```text
 .
-├── core/                        # Core simulation logic
-│   ├── __init__.py              # Makes the directory a Python package
-│   ├── cell_logic.py            # Cell diffusion and migration (laplace operator)
-│   └── tissue_logic.py          # Mechano-regulation and differentiation logic
-├── data/                        # Data storage
-│   ├── processed/               # Cleaned or final simulation outputs
-│   └── raw/                     # Initial conditions or external data
-├── results/                     # Directory for saved plots and snapshots
-├── utils/                       # Helper functions
-│   ├── __init__.py              # Makes the directory a Python package
-│   ├── generation.py            # Functions to create artificial bone geometry
-│   └── visualize.py             # Matplotlib logic for temporal healing plots
-├── config.py                    # Central configuration (properties, forces, constants)
-├── main.py                      # Main entry point; runs the simulation loop
-├── README.md                    # Project documentation and overview
-├── requirements.txt             # List of required Python libraries
-└── .gitignore                   # Files and folders for Git to ignore (e.g., __pycache__)
+├── core/                        # Core simulation mechanics
+│   ├── __init__.py              # Declares directory as a Python package
+│   ├── cell_logic.py            # Cell diffusion and migration (Laplace operator)
+│   └── tissue_logic.py          # Mechano-regulation and differentiation decision trees
+├── data/                        # Medical image & data storage
+│   ├── processed/               # Cleaned or final simulation outputs (e.g., STL/VTK)
+│   └── raw/                     # Initial conditions or external clinical scan profiles
+├── results/                     # Directory for saved plots and visualization snapshots
+├── tests/                       # Automated validation protocols
+│   ├── __init__.py              # Declares directory as a Python package
+│   └── test_simulation.py       # Unit tests verifying structural math and matrices
+├── utils/                       # Secondary helper scripts
+│   ├── __init__.py              # Declares directory as a Python package
+│   ├── generation.py            # Generates artificial, cubic cortical bone geometries
+│   └── visualize.py             # Matplotlib GUI logic for interactive 4D timeline slicing
+├── config.py                    # Central configuration (properties, forces, time steps)
+├── LICENSE                      # Project open-source distribution terms (BSD License)
+├── main.py                      # Main simulation loop entry point
+├── README.md                    # System documentation and project overview
+└── requirements.txt             # Mandatory environment external dependencies
 ```
-## important modules
 
-*cell_logic.py*
+## Core Program Modules
 
-Handles cell diffusion throughout fracture. Is where laplacian is calculated
+core/cell_logic.py: Handles cell diffusion throughout the fracture gap using finite difference methods.
 
-*tissue_logic.py*
+core/tissue_logic.py: Computes octahedral shear strains from applied loads to update localized Young's Moduli of the bone voxels.
 
-Handles calculation of stimulation due to applied force and subsequent change in Young's modulus of bone in fracture.
+utils/generation.py: Initializes the starting geometric domain consisting of two rigid bone blocks separated by a granulation tissue fracture gap. Good for easy testing. 
 
-*generation.py*
+## Further Structural Building & Imaging Data
 
-Handles generation of artificial bone geometery.
+If a user wishes to store the structural state at any given step, snapshots can be logged inside the results/ folder. Additionally, the data/raw/ and data/processed/ folders can accept scanned geometries (such as segmentations from human CT scans). For complex geometries, 3D Slicer can be utilized to generate compatible mesh formats which will require conversion of pixel density into Young's modulus.
 
+## System Performance Note
 
-## Further building
-
-If the user wants to store the bone grid at any given time step, there is a results section which these can be saved to. additionally, there is a raw and processed data section for the storage of scan data if one wants to try using this code on a more complicated geometry like a CT scan. An example scan would be included, but it is too much data to upload.
+The simulation updates 4-dimensional attributes over a 50×50×50 matrix space as standard. Because it recalculates finite-difference physics explicitly for every simulated hour over multiple months, the loop is computationally intensive. Expect high CPU and memory utilization on personal laptops during long execution timelines.
 
 
 ## Resources:
@@ -68,24 +68,50 @@ If the user wants to store the bone grid at any given time step, there is a resu
 
 NumPy (Arrays), SciPy (Solvers), Matplot lib (Graphing)
 
-If trying to use external geometries, like from a CT, 3D Slicer is used to generate the mesh and is saved.
+If trying to use external geometries, like from a CT, 3D Slicer is used to generate the mesh and can be saved in processed data.
 
 ## Usage guide
 
-To run the simulation, you just need to run the main.py module.
+To execute the core simulation loop and open the dynamic, interactive slicer GUI dashboard:
+run in terminal "python main.py"
 
-If you want to modify anything about the simulation, you only need to look in the config and the main files. All the modulus are built around config so that they do not define any constants locally. If you change anything about the structure of the package, make sure the imports from config are still intact so that there are no missing values (I would recommend just keeping my structure).
+All major numerical parameters are bound globally to config.py to prevent local hardcoding. You can modify things like the diffusion coefficient D, the material convergence factor alpha, or the day night loading parameters by altering their values inside config.py.
 
-Make sure to have numpy, matplotlib, and scipy pip installed before running. you could run this to do that 
-"pip install numpy matplotlib scipy".
+Caution: The mechanobiological decision trees are highly sensitive to variations in constants like D, alpha, and the applied force. They have been calibrated to model general bone healing over 3-4 months.
 
-Be carful about modifying constants like D, alpha, and the applied force. The simulation is very sensitive to these constants. The force is an especially sensitive constant.
+Install all external package dependencies using the central requirements file:
+run in terminal "pip install -r requirements.txt"
 
-Be careful about running this simulations on a personal laptop, unless you enjoy the sound of your cooling fans trying to achieve lift-off. The simulation is very memory intensive and it could be very demanding depending on your device.
+## Expected Output
 
-You may see some sections of the code that are commented out. Most of these are pieces of code I am hoping I will be able to implement later, if possible.
+```text
+Initializing geometry...
+Starting simulation for 112 days...
+Day 0: Applied Force = -0.15 N
+Day 1: Applied Force = -0.15 N
+...
+Day 30: Applied Force = -10 N
+...
+Day 60: Applied Force = -80 N
+...
+Simulation complete. Rendering temporal progression...
+```
+Upon completion, a 2-panel GUI will render showing interactive slice cross-sections coupled with a real-time biomechanical timeline graph tracing the core of the fracture gap.
 
-At the moment, I am using a "brick" of artificially generated bone for tests of the simulation. If you want to make any changes in this regard, that would be in the utils.generation module.
+## Verification & Unit Testing
+
+To run the automated validation tests checking that geometry initialization, zero-loading configurations, and cell boundary parameters remain correct:
+run in terminal "python -m unittest discover tests"
+
+ **Expected Output**
+
+```text
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+```
 
 ### Literature:
 1. **Lacroix, D., & Prendergast, P. J. (2002).** A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. *Journal of Biomechanics*, 35(9), 1163-1171.
