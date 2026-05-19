@@ -113,6 +113,10 @@ Ran 3 tests in 0.002s
 OK
 ```
 
+## Report Location
+
+This project is part of the final assignment for the Numerical Methods course I am taking at Adelphi University. For my Professor when they read this, the final report can be found in "Numerical Methods (Project Report).ipynb" file.
+
 ### Literature:
 1. **Lacroix, D., & Prendergast, P. J. (2002).** A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. *Journal of Biomechanics*, 35(9), 1163-1171.
    - *Applied to:* The voxel-based tissue phenotype decision tree.
