@@ -70,9 +70,6 @@ def main():
             history.append(bone_grid.copy()) # Copy is vital to keep unique daily data
             days_logged.append(int(day)) # Log the day as an integer for easier visualization labels
 
-        print(bone_grid[25, 25, 25]) # Print the properties of the central voxel for debugging
-
-
     # --- 3. VISUALIZATION ---
     print("Simulation complete. Rendering temporal progression...")
     create_interactive_slicer(history, days_logged)
