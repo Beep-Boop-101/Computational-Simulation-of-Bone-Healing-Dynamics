@@ -118,8 +118,11 @@ OK
 This project is part of the final assignment for the Numerical Methods course I am taking at Adelphi University. For my Professor when they read this, the final report can be found in "Numerical Methods (Project Report).ipynb" file.
 
 ### Literature:
-1. **Lacroix, D., & Prendergast, P. J. (2002).** A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. *Journal of Biomechanics*, 35(9), 1163-1171.
-   - *Applied to:* The voxel-based tissue phenotype decision tree.
-2. **Komarova, S. V., et al. (2003).** Mathematical model predicts a critical role for osteoclast autocrine regulation in the control of bone remodeling. *Bone*, 33(2), 206-215.
-   - *Applied to:* The ODE cellular dynamics of osteoblasts and osteoclasts.
-3. **R. HUISKES*, W. D., & Prendergast, P. J. (1997).** A biomechanical regulatory model for periprosthetic fibrous-tissue differentiation. *Journal of Material Science*, 8, 785–788.
+
+Huiskes, R., Van Driel, W. D., & Prendergast, P. J. (1997). A biomechanical regulatory model for periprosthetic fibrous-tissue differentiation. Journal of Materials Science: Materials in Medicine, 8, 785–788.
+
+Komarova, S. V., et al. (2003). Mathematical model predicts a critical role for osteoclast autocrine regulation in the control of bone remodeling. Bone, 33(2), 206-215.
+
+Lacroix, D., & Prendergast, P. J. (2002). A mechano-regulation model for tissue differentiation during fracture healing: analysis of gap size and loading. Journal of Biomechanics, 35(9), 1163-1171.
+
+Lacroix, D., Prendergast, P.J., Li, G. et al. (2002). Biomechanical model to simulate tissue differentiation and bone regeneration: Application to fracture healing. Medical & Biological Engineering & Computing . 40, 14–21.
